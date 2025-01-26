@@ -61,7 +61,7 @@
             if (task) {
                 let tasks = getCookie('tasks');
                 tasks = tasks ? JSON.parse(tasks) : [];
-                tasks.push(task);
+                tasks.push({ text: task, completed: false });
                 setCookie('tasks', JSON.stringify(tasks), 30);
                 renderTasks();
                 taskInput.value = '';
@@ -77,6 +77,15 @@
             renderTasks();
         }
 
+        // Function to toggle task completion
+        function toggleTask(index) {
+            let tasks = getCookie('tasks');
+            tasks = tasks ? JSON.parse(tasks) : [];
+            tasks[index].completed = !tasks[index].completed;
+            setCookie('tasks', JSON.stringify(tasks), 30);
+            renderTasks();
+        }
+
         // Function to render tasks
         function renderTasks() {
             const todoList = document.getElementById('todoList');
@@ -85,10 +94,20 @@
             todoList.innerHTML = '';
             tasks.forEach((task, index) => {
                 const li = document.createElement('li');
-                li.textContent = task;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                checkbox.onchange = () => toggleTask(index);
+                const span = document.createElement('span');
+                span.textContent = task.text;
+                if (task.completed) {
+                    span.style.textDecoration = 'line-through';
+                }
                 const button = document.createElement('button');
                 button.textContent = 'Remove';
                 button.onclick = () => removeTask(index);
+                li.appendChild(checkbox);
+                li.appendChild(span);
                 li.appendChild(button);
                 todoList.appendChild(li);
             });
